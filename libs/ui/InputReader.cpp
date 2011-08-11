@@ -1936,6 +1936,47 @@ void TouchInputMapper::parseCalibration() {
     const InputDeviceCalibration& in = getDevice()->getCalibration();
     Calibration& out = mCalibration;
 
+    out.havexscale = in.tryGetProperty(String8("touch.5pointcalib.xscale"), out.xscale);
+    out.havexymix = in.tryGetProperty(String8("touch.5pointcalib.xymix"), out.xymix);
+    out.havexoffset = in.tryGetProperty(String8("touch.5pointcalib.xoffset"), out.xoffset);
+    out.haveyxmix = in.tryGetProperty(String8("touch.5pointcalib.yxmix"), out.yxmix);
+    out.haveyscale = in.tryGetProperty(String8("touch.5pointcalib.yscale"), out.yscale);
+    out.haveyoffset = in.tryGetProperty(String8("touch.5pointcalib.yoffset"), out.yoffset);
+
+    /*
+     * If no values were avaialble, use default values for the 4.3" Sharp LCD
+     */
+
+    if (!out.havexscale) {
+        out.havexscale = true;
+        out.xscale = 0.014678;
+    }
+
+    if (!out.havexymix) {
+        out.havexymix = true;
+        out.xymix = -1.999633;
+    }
+
+    if (!out.havexoffset) {
+        out.havexoffset = true;
+        out.xoffset = 486.505310;
+    }
+
+    if (!out.haveyxmix) {
+        out.haveyxmix = true;
+        out.yxmix = 1.223953;
+    }
+
+    if (!out.haveyscale) {
+        out.haveyscale = true;
+        out.yscale = 0.003067;
+    }
+
+    if (!out.haveyoffset) {
+        out.haveyoffset = true;
+        out.yoffset = -18.599975;
+    }
+
     // Touch Size
     out.touchSizeCalibration = Calibration::TOUCH_SIZE_CALIBRATION_DEFAULT;
     String8 touchSizeCalibrationString;
@@ -2574,10 +2615,33 @@ void TouchInputMapper::dispatchTouch(nsecs_t when, uint32_t policyFlags,
             uint32_t inIndex = touch->idToIndex[id];
 
             const PointerData& in = touch->pointers[inIndex];
+            float x, y;
 
             // X and Y
-            float x = float(in.x - mLocked.xOrigin) * mLocked.xScale;
-            float y = float(in.y - mLocked.yOrigin) * mLocked.yScale;
+            if (mCalibration.havexscale && mCalibration.havexymix &&
+                mCalibration.havexoffset && mCalibration.haveyxmix &&
+                mCalibration.haveyscale && mCalibration.haveyoffset) {
+              x = float(in.x - mLocked.xOrigin) * mLocked.xScale;
+              y = float(in.y - mLocked.yOrigin) * mLocked.yScale;
+              float x_temp = float(in.x - mLocked.xOrigin);
+              float y_temp = float(in.y - mLocked.yOrigin);
+
+              float xscale = mCalibration.xscale;
+              float xymix = mCalibration.xymix;
+              float xoffset = mCalibration.xoffset;
+              float yxmix = mCalibration.yxmix;
+              float yscale = mCalibration.yscale;
+              float yoffset = mCalibration.yoffset;
+
+              float x_after_calib = (xscale * x_temp) + (xymix * y_temp) + xoffset;
+              float y_after_calib = (yxmix * x_temp) + (yscale * y_temp) + yoffset;
+
+              x = x_after_calib;
+              y = y_after_calib;
+            } else {
+              float x = float(in.x - mLocked.xOrigin) * mLocked.xScale;
+              float y = float(in.y - mLocked.yOrigin) * mLocked.yScale;
+            }
 
             // ToolMajor and ToolMinor
             float toolMajor, toolMinor;

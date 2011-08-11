@@ -656,6 +656,20 @@ protected:
 
     // Immutable calibration parameters in parsed form.
     struct Calibration {
+        // 5 Point calibration algorithm coefficients
+        bool havexscale;
+        float xscale;
+        bool havexymix;
+        float xymix;
+        bool havexoffset;
+        float xoffset;
+        bool haveyxmix;
+        float yxmix;
+        bool haveyscale;
+        float yscale;
+        bool haveyoffset;
+        float yoffset;
+
         // Touch Size
         enum TouchSizeCalibration {
             TOUCH_SIZE_CALIBRATION_DEFAULT,
