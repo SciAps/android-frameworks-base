@@ -14,6 +14,10 @@ ifeq ($(TARGET_BOARD_PLATFORM),omap3)
 LOCAL_CFLAGS += -DOMX_FIX
 endif
 
+ifeq ($(TARGET_BOARD_PLATFORM),dm3730)
+LOCAL_CFLAGS += -DOMX_FIX
+endif
+
 LOCAL_SRC_FILES:=                     \
 	OMX.cpp                       \
         OMXComponentBase.cpp          \
