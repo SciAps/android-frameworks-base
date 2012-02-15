@@ -1949,7 +1949,7 @@ void TouchInputMapper::parseCalibration() {
 
     if (!out.havexscale) {
         out.havexscale = true;
-        out.xscale = 0.014678;
+        out.xscale = -0.014678;
     }
 
     if (!out.havexymix) {
