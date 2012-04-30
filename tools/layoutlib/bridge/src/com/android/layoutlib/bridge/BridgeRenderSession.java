@@ -82,7 +82,6 @@ public class BridgeRenderSession extends RenderSession {
         return super.setProperty(objectView, propertyName, propertyValue);
     }
 
-    @Override
     public Result getViewParent(Object viewObject) {
         if (viewObject instanceof View) {
             return Status.SUCCESS.createResult(((View)viewObject).getParent());
@@ -91,7 +90,6 @@ public class BridgeRenderSession extends RenderSession {
         throw new IllegalArgumentException("viewObject is not a View");
     }
 
-    @Override
     public Result getViewIndex(Object viewObject) {
         if (viewObject instanceof View) {
             View view = (View) viewObject;
